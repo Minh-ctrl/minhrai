@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'PressStart2P-Regular';
+    src: url(PressStart2P-Regular.ttf) format('truetype');
+}
+.default{
+    background-color: rgba(0,0,0,255);
+}
+.PressStart2P{
+    font-family: 'PressStart2P-Regular'
+}
+.darkMode{
+    color: black !important;
+    background-color: white !important;
+}
+.icon_inverted{
+    filter: invert(100%)
+
+}
