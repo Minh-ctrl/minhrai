@@ -13,6 +13,6 @@
     background-color: white !important;
 }
 .icon_inverted{
-    filter: invert(100%)
+    filter: invert(100%);
 
 }

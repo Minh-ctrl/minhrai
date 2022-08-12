@@ -2,6 +2,8 @@ query PostType {
   allPosts {
     title
     subtitle
+    slug
+    body
     tags {
       name
     }
