@@ -1,0 +1,9 @@
+query PostType {
+  allPosts {
+    title
+    subtitle
+    tags {
+      name
+    }
+  }
+}

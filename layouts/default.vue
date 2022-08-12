@@ -12,8 +12,8 @@ provide('darkMode', darkMode);
             <div class=" l:w-80 lg:w-64 md:w-32 md:fixed md:h-screen text-center flex flex-col md:flex-col overflow-y-auto">
                 <label @change="toggle()" for="green-toggle" class=" self-center relative items-center mr-5 cursor-pointer">
                     <input  type="checkbox" value="" id="green-toggle" class="sr-only peer">
-                    <div class="w-11 h-6 bg-white  peer dark:bg-white peer-focus:ring-green-300 
-                        dark:peer-focus:ring-green-800 peer-checked:after:translate-x-full 
+                    <div class="w-11 h-6 bg-white peer dark:bg-white  
+                        peer-checked:after:translate-x-full 
                         after:content-[''] after:absolute after:top-0.5 after:left-[2px] before:bg-white after:bg-slate-200 after:border-gray-300 
                         after:border  after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-900"></div>
                 </label>
@@ -22,7 +22,6 @@ provide('darkMode', darkMode);
                 <Nav :darkMode="darkMode"/>
             </div>
         </div>
-        <slot :darkMode="darkMode">
-        </slot>
+        <slot/> 
     </div>
 </template>
