@@ -4,6 +4,7 @@ query PostType {
     subtitle
     slug
     body
+    publishDate
     tags {
       name
     }

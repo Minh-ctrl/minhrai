@@ -33,7 +33,8 @@ watchEffect(()=>{
                         after:border  after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-900"></div>
                 </label>
                 <img :class="{icon_inverted: darkMode}" src="/mokapot.gif"/>
-                <div :class="{darkMode: darkMode}" class="title PressStart2P text-xl mt-10 mb-10 text-slate-200 ">THE_MOKA_POT</div>
+                <div :class="{darkMode: darkMode}" class="title PressStart2P text-xl text-slate-200 ">THE_MOKA_POT</div>
+                <div :class="{darkMode: darkMode}"  class="text-xs text-slate-200 PressStart2P">version 0.70</div>
                 <Nav :darkMode="darkMode"/>
             </div>
         </div>
