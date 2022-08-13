@@ -2,7 +2,6 @@
 import { inject } from 'vue'
 const darkMode = inject('darkMode');
 const { data, error } = await useAsyncData("post", () => GqlPostType());
-console.log(data);
 </script>
 <template>
     <body  >

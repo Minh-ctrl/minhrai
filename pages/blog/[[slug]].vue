@@ -1,4 +1,6 @@
 <script setup>
+    import { inject } from 'vue';
+    const darkMode = inject('darkMode');
     const {$markdown} = useNuxtApp();
     const { data, error } = await useAsyncData("post", () => GqlPostType());
     const content = ref('');
@@ -10,7 +12,7 @@
     });
 </script>
 <template>
-    <div class="block w-10/12">
-        <div v-html="content" class="text-white PressStart2P"></div>
+    <div class="block w-10/12" >
+        <div v-html="content"  :class="{darkMode: darkMode}" class="text-white PressStart2P"></div>
     </div>
 </template>

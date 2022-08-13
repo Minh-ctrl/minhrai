@@ -7,7 +7,7 @@ const toggle = () => {
 provide('darkMode', darkMode);
 </script>
 <template>
-    <div :class="{darkMode: darkMode}" class="default w-screen h-screen" >
+    <div>
         <div class="flex flex-row-reverse">
             <div class=" l:w-80 lg:w-64 md:w-32 md:fixed md:h-screen text-center flex flex-col md:flex-col overflow-y-auto">
                 <label @change="toggle()" for="green-toggle" class=" self-center relative items-center mr-5 cursor-pointer">

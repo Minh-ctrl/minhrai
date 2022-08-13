@@ -16,7 +16,6 @@
     filter: invert(100%);
 
 }
-
-body{
+.backgroundDark{
     background-color: black;
 }
