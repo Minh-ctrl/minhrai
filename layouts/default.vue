@@ -1,10 +1,25 @@
 <script setup>
 import { provide } from 'vue';
 const darkMode= ref(false);
+provide('darkMode', darkMode);
 const toggle = () => {
     darkMode.value = !darkMode.value;
-}
-provide('darkMode', darkMode);
+};
+watchEffect(()=>{
+useHead({
+  title: 'The Moka Pot',
+  // or, instead:
+  // titleTemplate: (title) => `My App - ${title}`,
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  charset: 'utf-8',
+  meta: [
+    { name: 'description', content: 'My amazing site.' }
+  ],
+  bodyAttrs: {
+    class: darkMode.value ? 'darkMode' : 'backgroundDark'
+  }
+});
+});
 </script>
 <template>
     <div>
