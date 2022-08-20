@@ -2,11 +2,26 @@
     font-family: 'PressStart2P-Regular';
     src: url(PressStart2P-Regular.ttf) format('truetype');
 }
+@font-face {
+    font-family: 'Nunito-regular';
+    src: url(Nunito.ttf) format('truetype');
+}
+@font-face {
+    font-family: 'SourceCode';
+    src: url(SourceCode.ttf) format('truetype');
+}
 .default{
     background-color: rgba(0,0,0,255);
 }
 .PressStart2P{
     font-family: 'PressStart2P-Regular'
+}
+.Nunito{
+    font-family: 'Nunito-regular';
+
+}
+.SourceCode{
+    font-family: 'SourceCode';
 }
 .darkMode{
     color: black !important;
@@ -20,8 +35,10 @@
 .backgroundDark{
     background-color: black;
 }
-.coffeMug{
-    list-style-image: url(../public/coffeeCup.gif);
-    /* filter: invert(100%) */
+.linkedin{
+    opacity: 90%;
 }
+/* .coffeMug{
+    list-style-image: url(../public/coffeeCup.gif);
+} */
 /* .coffeMug-inverted() */

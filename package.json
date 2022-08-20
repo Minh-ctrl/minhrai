@@ -13,6 +13,7 @@
   "dependencies": {
     "markdown-it": "^13.0.1",
     "nuxt-graphql-client": "^0.1.11",
-    "simple-syntax-highlighter": "^2.2.3"
+    "simple-syntax-highlighter": "^2.2.3",
+    "vue3-marquee": "^3.0.7"
   }
 }

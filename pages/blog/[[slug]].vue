@@ -10,9 +10,13 @@
     onMounted(()=>{
         content.value = $markdown.render(definedData.body);
     });
+    
 </script>
-<template>
-    <div class="block w-10/12" >
-        <div v-html="content"  :class="{darkMode: darkMode}" class="text-white PressStart2P"></div>
+<template >
+    <div class="sm:w-9/12 w-full">
+        <div  :class="{darkMode: darkMode}" class="italic text-emerald-500 PressStart2P text-center text-3xl xs:mt-2 mt-6" >{{definedData.title}}</div>
+        <div class="sm:m-0 mt-10">
+            <div v-html="content"  :class="{darkMode: darkMode}" class="text-slate-200 SourceCode m-4"></div>
+        </div>
     </div>
 </template>
