@@ -7,12 +7,12 @@
     "preview": "nuxt preview"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^5.3.1",
-    "nuxt": "3.0.0-rc.6"
+    "@nuxtjs/tailwindcss": "^6.2.0",
+    "nuxt": "^3.0.0"
   },
   "dependencies": {
     "markdown-it": "^13.0.1",
-    "nuxt-graphql-client": "^0.1.11",
+    "nuxt-graphql-client": "^0.2.23",
     "simple-syntax-highlighter": "^2.2.3",
     "vue3-marquee": "^3.0.7"
   }

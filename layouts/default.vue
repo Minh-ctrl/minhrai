@@ -16,7 +16,7 @@ watchEffect(()=>{
       { name: 'description', content: 'My amazing site.' }
     ],
     bodyAttrs: {
-      class: darkMode.value ? 'darkMode ' : 'backgroundDark'
+      class: darkMode.value ? 'darkMode' : 'backgroundDark'
     }
   });
 });
@@ -32,7 +32,7 @@ watchEffect(()=>{
                         after:content-[''] after:absolute after:top-0.5 after:left-[2px] before:bg-white after:bg-slate-200 after:border-gray-300 
                         after:border  after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-900"></div>
                 </label>
-                <img :class="{icon_inverted: darkMode}" class="  w-" src="/mokapot.gif"/>
+                <img :class="{icon_inverted: darkMode}" class="" src="/mokapot.gif"/>
 
                 <div :class="{darkMode: darkMode}" class="title PressStart2P text-xl text-slate-200">THE_MOKA_POT</div>
                 <div :class="{darkMode: darkMode}"  class="text-xs text-slate-200 PressStart2P">version 1.0</div>
