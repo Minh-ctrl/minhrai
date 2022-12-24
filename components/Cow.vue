@@ -7,20 +7,16 @@ defineProps({
 });
 </script>
 <template>
-<div class="flex flex-col justify-center">
-<pre :class="{darkMode: darkMode}" class="text-slate-200  font-mono font-size">
-</pre>
-   <ssh-pre language="js" class=" w-96  self-center">
+<div class="flex flex-col justify-center mt-2">
+   <pre language="js" class="w-96 self-center">
     _____________________________
-    (((const message_from_cow = 🍔 ))) 
+    const message_from_cow = 🍔 
     _____________________________
-    </ssh-pre>
-<pre :class="{darkMode: darkMode}" class="text-slate-200  font-mono font-size">
-  \    ^__^
-           \  (oo)\_______
-                (__)\        )\/\
-                 ||----w||
-                  ||     || </pre>
+\    ^__^
+        \  (oo)\______
+            (__)\        )\/\
+             ||----w||
+              ||     || </pre>
 </div>
 </template>
 

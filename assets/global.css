@@ -10,15 +10,68 @@
     font-family: 'SourceCode';
     src: url(SourceCode.ttf) format('truetype');
 }
+@font-face {
+    font-family: 'Roboto-Regular';
+    src: url(Roboto-Regular.ttf) format('truetype');
+}
 .default{
     background-color: rgba(0,0,0,255);
 }
-.PressStart2P{
+.roboto {
+    font-family: 'Roboto-Regular';
+    font-size: 1.25rem !important;
+}
+ .PressStart2P{
     font-family: 'PressStart2P-Regular'
 }
 .Nunito{
     font-family: 'Nunito-regular';
 
+}
+p {
+    line-height: 2rem;
+}
+p, ul {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.75rem;
+}
+li {
+    margin-bottom: 0.5rem;
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+ol {
+    margin-left: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    counter-reset: item;
+  }
+ol a {
+    --tw-text-opacity: 1;
+    color: rgb(16 185 129 / var(--tw-text-opacity));  
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
+    text-underline-offset: 1px;
+}
+
+ol li:before {
+    content: counter(item) ".";
+    --tw-text-opacity: 1;
+    color: rgb(16 185 129 / var(--tw-text-opacity));    
+    counter-increment: item;
+    position: absolute;
+    text-align: right;
+    transform: translate(-100%);
+    margin-left: -.4em;
+}
+h1, h2, h3, h4, h5, h6 {
+    text-align: center;
+    font-family:'PressStart2P-Regular';
+    --tw-text-opacity: 1;
+    color: rgb(16 185 129 / var(--tw-text-opacity));    
+    letter-spacing: .025rem;
+    font-size: 1.60rem;
 }
 .SourceCode{
     font-family: 'SourceCode';
@@ -38,6 +91,9 @@
 .linkedin{
     opacity: 90%;
 }
+/* li {
+    color: blue
+} */
 /* .coffeMug{
     list-style-image: url(../public/coffeeCup.gif);
 } */

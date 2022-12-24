@@ -2,7 +2,7 @@
 defineProps({
     darkMode: Boolean,
 })
-const exampleData= [{name: 'blog', id:1, route:'/'},{name: 'fav', id:2, route:'/fav'},  {name:'Data Structure Studies', id: 3, route: '/data_structure'},  {name: 'about', id: 4, route:'/about'}];
+const exampleData= [{name: 'Blog', id:1, route:'/'},{name: 'Favs', id:2, route:'/fav'},  {name:'DSA', id: 3, route: '/data_structure'},  {name: 'About', id: 4, route:'/about'}];
 </script>
 <template>
         <div class="">
