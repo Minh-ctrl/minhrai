@@ -1,166 +1,538 @@
 ---
-title: 'Four Eras of JavaScript Frameworks'
-tagline: ''
+title: "Ember.js Native Class Update: 2019(nbsp)Edition"
+tagline: ""
 ---
 
-I started coding primarily in JavaScript back in 2012. I had built a PHP app for a local business from the ground up, a basic CMS and website, and they decided that they wanted to rewrite it and add a bunch of features. The manager of the project wanted me to use .NET, partially because it's what he knew, but also because he wanted it to feel like a native application - no page refreshes or long pauses between actions. After a bit of research and prototyping, I convinced him that we could do the same thing with the web, using one of the brand new JS frameworks that were just starting to come out.
+These are exciting times in Ember! With Ember Octane just around the corner, native class support has [officially landed in v3.6](https://emberjs.com/blog/2018/12/13/ember-3-6-released.html#toc_new-features-2) (with a [polyfill](https://github.com/pzuraq/ember-native-class-polyfill) supporting v3.4+), and the [Decorators RFC](https://github.com/emberjs/rfcs/blob/master/text/0408-decorators.md) has been merged and will be implemented soon (pending decorators moving to stage 3 in the January meeting). Some time ago, I wrote [an article](https://medium.com/build-addepar/es-classes-in-ember-js-63e948e9d78e) that detailed how to use native classes in Ember, along with best practices for writing them. Since then, some major changes have occured, and I wanted to give a quick update for early adopters and folks who are curious about them in general.
 
-The first framework I chose was actually Angular 1. I built a decent chunk of the app, with a FuelPHP backend, before I ran into some issues with the community router - it would flicker whenever you rerendered subroutes/outlets, and really it just didn't feel like it had been designed with that use case in mind. Someone recommended Ruby on Rails + Ember to me, and after giving it a shot I decided it worked pretty well. I liked the philosophy of both frameworks, liked the communities, and overall it was very productive compared to the alternatives at the time.
+This post will focus on changes since the original article and current best practices.  We'll be talking about:
 
-A lot has changed since then - frameworks have come, gone, and evolved massively. The idea that you could build apps in JavaScript, in the browser, went from somewhat fringe to a standard practice. And the infrastructure that we build on has completely changed, enabling a host of new possibilities.
+* [The Native Class Constructor Update RFC](#nativeclassconstructorupdaterfc)
+* [`new` vs. `create`](#newvscreate)
+* [`constructor` vs. `init`](#constructorvsinit)
+* [Class Fields vs. `extend()`](#classfieldsvsextend)
+* [Avoid Class Field Arrow Functions](#avoidclassfieldarrowfunctions)
+* [`super` vs. `_super()`](#supervssuper)
+* [When It's Ok to Use `extend()`](#whenitsoktouseextend)
+* [Avoiding `reopen` and `reopenClass`](#avoidingreopenandreopenclass)
+* [Avoiding `EmberObject`](#avoidingemberobject)
+* [Misc. Class Tips](#miscclasstips)
+
+If you're new to native classes in Ember, the most comprehensive and up-to-date documentation is the [official Ember Decorators documentation site](https://ember-decorators.github.io/ember-decorators/docs/native-class-basics), where you can find a detailed guide to all of the differences in native classes and an overview of native class features. The [MDN documentation on classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes) is also a great resource for learning more about the basics of native classes and how things like inheritance in Javascript work in the first place (spoiler: it's sometimes just a _little_ bit confusing).
 
-There's also been a fair share of competition and conflict between ideas in that time. I think most of us who've been in the frontend space for a while have probably been in some debates about... well, everything. Which JavaScript framework to use, how to write your CSS, functional vs object-oriented programming, how best to manage state, which build system or tool was the most flexible and the fastest, and so on. Looking back, it's funny to me how often we were arguing about the wrong things and missing the larger patterns, but of course that's the benefit of hindsight.
+Alright, without further ado, let's get this inaugural blog post started!
 
-So I wanted to do a retrospective, looking back at the last few decades of JavaScript development and at how far we've come. I think we can roughly divide it into four main eras:
+## Native Class Constructor Update RFC
 
-1. The Before Times
-2. The First Frameworks
-3. Component-Centric View Layers
-4. Full-stack Frameworks (_← We're here_)
+After the [original ES Class RFC](https://github.com/emberjs/rfcs/blob/master/text/0240-es-classes.md) was merged, it became clear that there were some major ergonomic issues with the behavior of `EmberObject`'s constructor. Specifically, the behavior led to default values always overwriting values passed to `create` (as discussed in the [Class Fields section](https://medium.com/build-addepar/es-classes-in-ember-js-63e948e9d78e#96a9) of the original article). This behavior was a constant stumbling block for new and current Ember users alike, so we made a [second RFC](https://github.com/emberjs/rfcs/blob/master/text/0337-native-class-constructor-update.md) that updated `EmberObject` to assign values passed in _last_.
 
-Each era had its own main themes and central conflicts, and in each one we learned key lessons as a community and advanced, slowly but surely.
+This means that many of the workarounds that were used to assign class fields before are _no longer necessary_ 🎉. It is now best practice to assign default values to class fields:
 
-Today the debates rage on: Has the web grown too bloated? Does the average website really _need_ to be written in React? Should we even use JavaScript at all? I don't think we can see into the future here, and in the end I suspect we'll probably discover that once again, we were talking past each other and missing the bigger picture. But maybe getting a bit of perspective from the past will help us to move forward.
+```js
+// before
+class Person extends EmberObject {
+  firstName = this.firstName || 'Bruce';
+  lastName = this.lastName || 'Wayne';
+}
 
-## The Before Times
+class Person extends EmberObject {
+  firstName = _.defaultTo(this.firstName, 'Bruce');
+  lastName = _.defaultTo(this.lastName, 'Wayne');
+}
 
-<hr class="mt-4"/>
+class Person extends EmberObject {
+  @argument firstName = 'Bruce';
+  @argument lastName = 'Wayne';
+}
 
-JavaScript was first released in 1995. Like I mentioned above, I started writing JS in 2012, almost two decades later, near the beginning of the era I'm dubbing the First Frameworks. As you can imagine, I'm probably going to gloss over a lot of history here, and this era could probably be broken down into many sub-eras in their own right, each dominated by its own patterns and libraries and build tools and so-on.
+// after
+class Person extends EmberObject {
+  firstName = 'Bruce';
+  lastName = 'Wayne';
+}
+```
 
-That said, I can't write about what I didn't experience. By the time I started writing frontend apps, there was a new generation of frameworks that had just started to reach maturity: Angular.js, Ember.js, Backbone, and more.
+## `new` vs. `create`
 
-Prior to these, the state of the art had been libraries like jQuery and MooTools. These libraries were very important in their time - they helped to smooth over the differences between the way that browsers implemented JavaScript, which were _very_ significant. For instance, Internet Explorer implemented eventing completely differently than Netscape - bubbling events vs capturing events. That's why the standard we have today implemented both, ultimately, but before that you needed to use libraries to write code that would work in both browsers. These libraries were primarily used to make small, self-contained UI widgets. The majority of application business logic still took place via forms and standard HTTP requests - rendering HTML on the server and serving it up to the client.
+As a consequence of the constructor update RFC, creating an instance of a class using `new EmberObject()` was made impossible. This was never a _public_ API, but did work previously, and some users had begun using it this way. For classes that extend `EmberObject`, you should continue to use `create()`:
 
-There also weren't many build tools to speak of in this era, at least that I was aware of. JavaScript didn't have modules yet (at least not standard ones), so there wasn't any way to import code. Everything was global, and it was pretty difficult to organize things.
+```js
+class Person extends EmberObject {
+  firstName = 'Bruce';
+  lastName = 'Wayne';
+}
 
-In this environment, it's understandable that JS was generally seen as a toy language and not something you'd write a full app in. The most common thing you would do was include jQuery, throw together some scripts for a few UI widgets, and call it a day. As time went on and XHR was introduced and popularized, people started to put parts of their UI flow into a single page, especially for complex flows that required multiple back and forth interactions between the client and the server, but the majority of the app stayed firmly on the server.
+let person = Person.create({
+  firstName: 'Carol',
+  lastName: 'Danvers'
+});
+```
 
-This contrasted pretty significantly with mobile apps when they started to hit the scene. From the get go, mobile apps on iOS and Android were full applications written in Serious Languages™ like Objective C and Java. Moreover, they were fully API driven - all of the UI logic lived on the device, and communication with the server was purely in data formats. This resulted a much better UX and mobile apps exploded in popularity, leading quite directly to where we are today with debates about which is better, mobile or the web.
+It's important to note that this **only applies to classes that extend `EmberObject`**! For classes that do not, you should define your own constructor and use `new`:
 
-Doing all of _that_ with JavaScript was seen as ludicrous at first. But as time went on, applications started to get more ambitious. Social networks added chat and DMs and other real-time features, Gmail and Google Docs showed that desktop-equivalent experiences _could_ be written in the browser, and more and more companies were turning to writing web apps for more and more use cases, since the web worked everywhere and was easier to maintain over time. This pushed the envelope forward - it was now clear that JS _could_ be used to write non-trivial apps.
+```js
+class Person {
+  constructor(firstName, lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+}
 
-Doing so, however, was the hard part. JavaScript did not have all the features it has today - like I said, everything was global and you generally had to manually download and add every external library to your static assets folder. NPM didn't yet exist, modules weren't a thing, and JS didn't have half the features it has today. For the most part, every app was bespoke, with a different setup of plugins on every page, a different system for managing state and rendering updates in every plugin. To solve these issues, the very first JavaScript frameworks started to emerge.
+let person = new Person('Carol', 'Danvers');
+```
 
-## The First Frameworks
+## `constructor` vs. `init`
 
-<hr class="mt-4"/>
+There were also two changes to the behavior of the `constructor` method in classes that extend `EmberObject`:
 
-Around the late 2000's and early 2010's the first JS frameworks specifically designed for writing full client applications started to come out. A few of the notable frameworks of this era were:
+1. Injections are no longer available
+2. Create params are no longer available
 
-1. [Backbone.js](https://backbonejs.org/)
-2. [Angular 1](https://angularjs.org/)
-3. [Knockout.js](https://knockoutjs.com/)
-4. [SproutCore](https://sproutcore.com/)
-5. [Ember.js](https://emberjs.com/)
-6. [Meteor.js](https://www.meteor.com/)
+These both get assigned _after_ the object has been fully created, but _before_ `init` is called. So, they are both available in `init`. The official recommendation is to always use `init` when extending from any `EmberObject` based classes, since it will consistently have everything needed.
 
-There are, of course, plenty of others, and probably some that were even bigger in some circles. These are the ones that I remember, mostly because I used them to prototype or build things and they were relatively popular.
+```js
+// before
+class Profile extends Component {
+  @service store;
 
-This was a generation of frameworks that were setting out into uncharted territory. On the one hand, what they were trying to do was highly ambitious, and plenty of people thought it would never really work. There were many detractors who thought that single-page JS apps (SPAs) were fundamentally worse, and in a lot of ways they were right - client side rendering meant that bots couldn't crawl these pages easily, and that users would have to wait seconds for apps to even start to paint. A lot of these apps were accessibility nightmares, and if you turned off JavaScript they wouldn't work at all.
+  // argument
+  person = this.person || null;
 
-On the other hand, we had no experience building full apps in JS, collectively, and so there were tons of competing ideas about the best ways to do it. Most frameworks tried to mimic was was popular on other platforms, so almost all of them ended up being some iteration of Model-View-\*: Model-View-Controller, Model-View-Producer, Model-View-ViewModel, etc. None of these really ended up working out though in the long run - they weren't particularly intuitive and they got really complicated really quickly.
+  constructor() {
+    super(...arguments);
+    let details = this.store.queryRecord('details', this.person.id);
+  }
+}
 
-This was also an era when we really began to experiment with how to _compile_ JavaScript applications. Node.js was released in 2009, with NPM following it in 2010, introducing packages to (server-side) JavaScript. CommonJS and AMD competed for how best to define JS modules, and build tools like Grunt, Gulp, and Broccoli competed over how to put those modules together into a shippable final product. For the most part these were very general task-runner-like tools, which could really build anything and just _happened_ to be building JavaScript - and HTML, and CSS/SASS/LESS, and the many other things that go into a web app.
+// after
+class Profile extends Component {
+  @service store;
 
-We learned a lot of things from this era, however; important fundamental lessons, including:
+  // argument
+  person = null;
 
-- URL-based routing is fundamental. Apps that don't have it break the web, and it needs to be thought about from the beginning in a framework.
-- Extending HTML via templating languages is a powerful abstraction layer. Even if it can be at times a bit clunky, it makes keeping your UI in sync with your state much easier.
-- Performance for SPAs was _hard_, and the web has a lot of extra constraints that native apps do not. We need to ship all of our code over the wire, have it JIT, and then run just to get our apps started, whereas native apps are already downloaded and compiled. That was a _massive_ undertaking.
-- JavaScript had a lot of issues as a language, and it really needed to be improved to make things better - frameworks couldn't do it alone.
-- We absolutely needed better build tools, modules, and packaging in order to write apps at scale.
+  init() {
+    super.init(...arguments);
+    let details = this.store.queryRecord('details', this.person.id);
+  }
+}
+```
+
+## Class Fields vs. `extend()`
 
-Overall, this era was fruitful. Despite the shortcomings, the benefits of separating clients from APIs were massive as apps grew in complexity, and in many cases the resulting UX was phenomenal. If things were different, this era may have continued on and we would still be iterating on MV\* style ideas to this day.
+When extending using `extend()`, all values that were passed in to the method were assigned to the _prototype_ of the class.
+
+```js
+const Person = EmberObject.extend({
+  sayHello() {
+    console.log('hi!');
+  },
+
+  friends: [],
+});
+
+console.log(Person.prototype.hasOwnProperty('sayHello')); // true
+console.log(Person.prototype.hasOwnProperty('friends')); // true
+```
+
+This led to the infamous "shared state" problem, where an object or array passed into a class definition would be shared between every instance of that class:
+
+```js
+let peterParker = Person.create();
+let wandaMaximoff = Person.create();
+
+peterParker.friends.push('Tony Stark');
+
+console.log(wandaMaximoff.friends); // ['Tony Stark']
+```
+
+By contrast, when using `class ... extends`, only _methods_ and
+_getters/setters_ are assigned to the prototype. Class fields are assigned to the
+_instance_ of the class:
+
+```js
+class Person extends EmberObject {
+  sayHello() {
+    console.log('hi!');
+  }
 
-But then an asteroid came out of nowhere, smashing the existing paradigms apart and causing a minor extinction event that propelled us into the next era - an asteroid named React.
+  friends = []
+}
 
-## Component-Centric View Layers
+console.log(Person.prototype.hasOwnProperty('sayHello')); // true
+console.log(Person.prototype.hasOwnProperty('friends')); // false
 
-<hr class="mt-4"/>
+let peterParker = Person.create();
 
-I don't think React invented components, but to be honest I'm not quite sure where they first came from. I know there's prior art going back to at least XAML in .NET, and web components were also beginning to develop as a spec around then. Ultimately it doesn't really matter - once the idea was out there, every major framework adopted it pretty quickly.
+console.log(peterParker.hasOwnProperty('sayHello')) // false
+console.log(peterParker.hasOwnProperty('friends')) // true
+```
 
-It made complete sense in hindsight - extend HTML, reduce long-lived state, tie the JS business logic directly to the template (be that JSX or Handlebars or Directives). Component-based applications removed most of the abstractions necessary to get things done, and also remarkably simplified the lifecycle of code - everything was tied to the lifecycle of the component instead of the app, and that meant you had much less to think about as a developer.
+One common pattern that existed to avoid the shared state problem in classic classes was assigning values in the `init` hook of the class. With native class fields this is _not_ an issue. Class fields are assigned a new copy of their value for every instance, which means that there is no accidental sharing of state. The current best practice is to move any property assignments in `init` to class fields:
 
-However, there was another shift at the time: frameworks started touting themselves as "view-layers" instead of full-fledged frameworks. Instead of solving all of the problems needed for a frontend app, they would focus on just solving rendering problems. Other concerns, like routing, API communication, and state management, were left up to the user. Notable frameworks from this era include:
+```js
+// before
+const Person = EmberObject.extend({
+  init() {
+    this.friends = [];
+  }
+});
 
-1. [React.js](https://reactjs.org/)
-2. [Vue.js](https://vuejs.org/)
-3. [Svelte](https://svelte.dev/)
-4. [Polymer.js](https://polymer-library.polymer-project.org/3.0/docs/devguide/feature-overview)
+// after
+class Person extends EmberObject {
+  friends = [];
+}
+```
 
-And many, many others. Looking back now, I think that this was a popular framing for this second generation of frameworks because it did do two main things:
+One exception here is when you are assigning a value that was passed into the class constructor, for classes that do _not_ extend `EmberObject`, or when you are defining a value based on _other_ values:
 
-1. It reduced scope dramatically. Rather than trying to solve all these problems up front, the core of the framework focused on rendering, and many different ideas and directions could be explored in the wider ecosystem for other functionality. There were plenty of terrible solutions, but there were also good ones, paving the way for the next generation to pick the best ideas from the cream of the crop.
-2. It made it much easier to adopt them. Adopting a full framework that took over your entire web page pretty much meant rewriting most your app, which was a non-starter with existing server-side monoliths. With frameworks like React and Vue, you could drop a little bit of them into an existing app one widget or component at a time, allowing developers to incrementally migrate their existing code.
+```js
+class Person {
+  constructor(firstName, lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+}
 
-These two factors led to second-gen frameworks growing rapidly and eclipsing the first-gen ones, and from a distance it all seems to make a lot of sense and is a logical evolution. But being in the midst of it was quite a frustrating experience at the time.
+class Person {
+  firstName = 'Thor';
+  lastName = 'Odinson';
 
-For one thing, this was not the framing that was encountered very often when debating which framework to use at work, or if we should rewrite our apps. Instead, very often it was "it's faster!" or "it's smaller!" or "it's all you need!". There was also the debate over functional programming vs object-oriented programming, with a lot of folks pushing FP as the solution to all of our problems. And to be fair, all of these things were true: View-layer-only-frameworks _were_ smaller (at first) and faster (at first) and all you needed (if you built or stitched together a lot of things yourself). And absolutely, functional programming patterns solved a _ton_ of problems that plagued JavaScript, and I think that on average JS has gotten a lot better because of them.
+  constructor() {
+    // fullName is based on firstName and lastName, so
+    // it should be assigned in the constructor
+    this.fullName = `${this.firstName} ${this.lastName}`;
+  }
+}
+```
 
-The reality, however, was that there are no silver bullets - there never are. Apps still grew enormous and bloated and complicated, state was still hard to manage, and fundamental problems like routing and SSR still needed to be solved. And for a lot of us, it seemed like what people wanted was to ditch the solution that was _trying_ to solve all of those problems for one that left that exercise up to the reader. In my experience, this was also universally within engineering orgs which would gladly accept this change in order to ship a new product or feature, and then fail to _fund_ the time needed to fully develop all of that extra functionality.
+The other exception is for static values that _should_ be constant. Creating a new instance of the value for each instance of the class is _usually_ a good thing, but in some cases this can be really bad for performance. For example, if you ever used the `layout` property to create a "single file component" with `ember-cli-handlebars-inline-precompile`, this will now create a new template per instance! This is why we created the `@layout` decorator in `ember-decorators`:
 
-The result (in my experience, more often than not) was homegrown frameworks built around these view layers that were themselves bloated, complicated, and very difficult to work with. Many of the problems that people have with SPAs I think come from this fragmented ecosystem, which came right at the time when SPA usage was exploding. I still often come across a new site that fails to properly do routing or handle other small details well, and it definitely is frustrating.
+```js
+import Component from '@ember/component';
+import { layout } from '@ember-decorators/component';
+import hbs from 'htmlbars-inline-precompile';
 
-But on the other hand, the existing full-service first-gen frameworks weren't doing too well at solving these problems either. Partially, this was due to a lot of tech-debt baggage. The first generation of frameworks were built before ES6, before modules, before Babel and Webpack, before we'd figured out _so_ many things. Evolving them iteratively was extremely difficult (I know this all too well from my experience as a former-Ember core team member), and rewriting them entirely, like Angular did with Angular 2, killed a ton of their community's momentum. So, developers were in between a rock and a hard place when it came to JavaScript frameworks - either choose an all-in-one solution that was starting to show its age, or jump into the free-for-all and DIY half your framework, hoping for the best.
+// before
+export default Component.extend({
+  // assigns the layout once to the prototype, so it's ok 👍
+  layout: hbs`{{this.firstName}} {{this.lastName}}`,
+});
 
-Like I said, at the time this was deeply frustrating, but a ton of innovation came out of all of it in the end. The JavaScript ecosystem advanced really quickly as these frameworks figured out their best practices, and a few other key changes happened:
+// bad!
+export default class PersonComponent extends Component {
+  // creates a new instance of the layout for every component! 🛑
+  layout = hbs`{{this.firstName}} {{this.lastName}}`;
+}
 
-- Transpilers like Babel became the norm, and helped to modernize the language. Rather than having to wait years for features to standardize, they could be used today, and the language itself started adding features at a much faster and more iterative pace.
-- ES Modules were standardized and allowed us to finally start building modern build tools like Rollup, Webpack, and Parcel around them. Import based bundling slowly became the norm, even for non-JS assets like styles and images, which dramatically simplified configuration for build tools and allowed them to become leaner, faster, and overall better.
-- The gap between Node and web standards closed slowly but surely as more and more APIs were standardized. SSR started to become a real possibility, and then something every serious app was doing, but it was still a somewhat bespoke setup each time.
-- Edge computing was released, giving JavaScript based server apps the benefits of SPAs in terms of distribution/response times (SPAs could previously generally _start_ loading faster due to being static files on a CDN, even if it took them longer to fully load and render in the end).
+// after
+// creates one instance of the layout, and assigns it to the class 💯
+@layout(hbs`{{this.firstName}} {{this.lastName}}`)
+export default class PersonComponent extends Component {}
+```
 
-By the end of this era, some problems still remained. State management and reactivity were (and are) still thorny problems, even though we had much better patterns than before. Performance was still a difficult problem, and even though the situation was improving, there were still many, many bloated SPAs out there. And the accessibility situation had improved, but it was (and is) still oftentimes an afterthought for many engineering orgs. But these changes paved the way for the next generation of frameworks, which I would say we are entering just now.
+In cases where other types of values are static like this, consider create constants instead.
 
-## Full-Stack Frameworks
+## Avoid Class Field Arrow Functions
 
-<hr class="mt-4"/>
+This one is more of a general native classes rule, rather than an Ember specific one. However, it is a pattern that is becoming more and more common, and it's something that should be avoided. Specifically, developers in the wider Javascript community are using arrow functions to create bound instance methods on a class for things like event handlers:
 
-This last era of frameworks has really snuck up on me, personally. I think that's because I've spent the last 4 years or so deep in the internals of Ember's rendering layer, trying to clean up the aformentioned tech-debt that's (still) affecting it as a first-gen framework. But it's also because it was much more subtle, as all of these third-gen frameworks are built around the view-layer frameworks of the previous generation. Notable entries include:
+```js
+// do not copy this. This is an antipattern!
+class Checkbox {
+  onClick = () => {
+    // handle click
+  };
 
-1. [Next.js](https://nextjs.org/) (React)
-2. [Nuxt.js](https://nuxtjs.org/) (Vue)
-3. [Remix](https://remix.run/) (React)
-4. [SvelteKit](https://kit.svelte.dev/) (Svelte)
-5. [Gatsby](https://www.gatsbyjs.com/) (React)
-6. [Astro](https://astro.build/) (Any)
+  constructor(element) {
+    this.element = element;
 
-These frameworks started up as the view-layers matured and solidified. Now that we all agreed that components were the core primitive to build on top of, it made sense to start standardizing other parts of the app - the router, the build system, the folder structure, etc. Slowly but surely, these meta-frameworks started to build up the same functionality that the all-in-one solutions of the first generation offered out of the box, picking the best patterns from their respective ecosystems and incorporating them as they matured.
+    this.element.addEventListener('click', this.onClick);
+  }
+}
+```
 
-And then they went a step further.
+The reasons why this is problematic include:
 
-Up until this point, SPAs had been exclusively focused on the client. SSR was something every framework aspired to solve, but only as an optimization, a way to get something rendered that would ultimately be replaced once the megabytes of JS had finally loaded. Only one first-gen framework dared to think bigger, Meteor.js, but its idea of "isomorphic JS" never really took off.
+1. It breaks inheritance and super, since class fields overwrite each other as the class is constructed
+2. `arguments` does not behave the same as a normal method
+3. It's difficult to mock in tests, since you can't change the function on the prototype of the class.
 
-But that idea was revisited as apps grew in size and complexity. We noticed that it was actually really useful to have a backend and frontend paired together, so that you could do things like hide API secrets for certain requests, modify headers when a page was returned, proxy API requests. And with Node and Deno implementing more and more web standards, with the gap between server-side JS and client-side JS shrinking every year, it started to seem like it wasn't such a crazy idea after all. Combine this with edge-computing and amazing tooling to go with it, and you have some incredible potential.
+For more details, check out [this rationale](https://github.com/mbrowne/bound-decorator/blob/master/MOTIVATION.md) on the official decorators proposal.
 
-This latest generation of frameworks makes full use of that potential, melding the client and the server together seamlessly, and I cannot stress enough how amazing this feels. I have, in the past 9 months of working with SvelteKit, sat back more times than I can count and said to myself "this is the way we should have always done it."
+Instead, you can use the `@action` decorator provided by Ember (and Ember Decorators), which binds a the handler lazily:
 
-Here are just a few of the tasks I've had recently that were made _incredibly_ easy by this setup:
+```js
+class Checkbox {
+  @action
+  onClick() {
+    // handle click
+  };
 
-- Adding server-side OAuth to our applications so that auth tokens never leave the server, along with an API proxy that adds the tokens whenever a request is sent to our API.
-- Proxying certain routes directly to our CDN so we can host static HTML pages built in any other framework, allowing users to make their own custom pages (a service we provide for some of our clients).
-- Adding several different one-off API routes when we needed to use an external service that required a secret key (no need to add a whole new route to our APIs and coordinate with the backend folks).
-- Moving our usage of LaunchDarkly server-side so that we can load less JS and incur lower costs overall.
-- Proxying our Sentry requests through a backend route so we can catch errors that would otherwise go unreported due to ad-blockers.
+  constructor(element) {
+    this.element = element;
 
-And this is just the tip of the iceberg. There are really so many cool things about this model, one of the biggest ones being how it is revitalizing the idea of [progressive enhancement](https://en.wikipedia.org/wiki/Progressive_enhancement), using the combined nature of the server and client to allow the client to _fallback_ to basic HTML + HTTP in cases where the user has disable JavaScript. I had fully given up on this practice myself when I began working on SPAs, assuming that they were the future, but it is really cool that we could possibly see a world where it makes a comeback.
+    this.element.addEventListener('click', this.onClick);
+  }
+}
+```
 
-These are the new features that, experientially, have me classifying these frameworks as a new generation. Problems that previously were either difficult or impossible to solve are now trivial, just a change to a little bit of response handling logic. Solid performance and UX is available out of the box, without any extra config needed. Instead of standing up entire new services, we're able to add a few extra endpoints or middlewares as needed. It has been life changing.
+## `super` vs. `_super()`
 
-I think that this generation has also addressed some of the main tension points between the first-gen and second-gen frameworks and their users. It started with the shift to zero-config terminology, but I think ultimately it was driven by the ecosystems around the second-gen frameworks maturing and stabilizing, and it's been a cultural shift. Third-gen frameworks are now trying to be all-in-one solutions again, trying to solve all of the fundamental problems that we need to solve as frontend devs - not just rendering.
+When using native classes, you should _never_ use `this._super()`. Unfortunately, there is not currently an assertion that prevents this (although we would like to add one), but there is a [linting rule](https://github.com/ember-cli/eslint-plugin-ember/blob/master/docs/rules/no-ember-super-in-es-classes.md) included with eslint-plugin-ember.
 
-Now more than ever it feels like the community is aligned in solving _all_ of the many problems that have plagued SPAs, and importantly, solving them _together_.
+All instances of calls to `this._super()` can be replaced instead with the `super` keyword. `super` works a little bit differently than `this._super()` though. When called in a constructor, you use it directly:
 
-## Where do we go next?
+```js
+class Car extends Vehicle {
+  constructor() {
+    super(...arguments);
 
-<hr class="mt-4"/>
+    this.wheels = 4;
+  }
+}
+```
 
-Overall, I think the JavaScript community is heading in the right direction. We are finally developing mature solutions that can build full apps from the ground up, solutions that are not "just a view-layer". We're finally starting to compete on the same playing field as SDKs for native apps, providing a full toolkit out of the box. We still have a lot of work to do here. Accessibility has long been an afterthought in the SPA space, and outside of GraphQL I still think that the data story could use some work (like it or not, much of the web still runs on REST). But the trend is in the right direction, and if we keep moving toward shared solutions I think we could solve these problems in a better way than ever before.
+It's actually a syntax error if you don't use `super` this way in constructors. However, when not used from the constructor, `super` gives access to _all_ of the parent class's instance properties and methods, and you must call the method on it explicitly:
 
-I'm also still excited about the potential behind bringing these patterns even further up, into the web platform itself. Web components are still quietly iterating, working on solutions to issues like SSR and getting rid of global registration, which would make them more compatible with these third-gen frameworks. In the other direction, WebAssembly could iterate on this model in an incredible way. Imagine being able to write a full-stack framework in _any_ language. Isomorphic Rust, Python, Swift, Java, etc. could finally reduce the barrier between frontends and backends to almost zero - just a bit of HTML templating at the edge of your system (which ironically brings us pretty much full circle, though with a much better UX).
+```js
+class Car extends Vehicle {
+  start() {
+    super.start(...arguments);
 
-My biggest hope here is that we're moving past the era of fragmentation, of every-day-a-new-JS-framework. Freedom and flexibility have bred innovation, but they've also resulted in a web experience that is messy, disjointed, and oftentimes fundamentally broken. And it makes sense that when developers have to choose between fifty-odd options and cobble them together themselves, with limited resources and tight deadlines, that this is the experience we would see. Some apps are brilliantly fast, consistent, reliable, and fun to use, while others are frustrating, confusing, slow, and broken.
+    this.currentGear = 'drive';
+  }
+}
+```
 
-If we can give devs easier to use tools that do-the-right-thing-by-default, maybe the average website will get a bit better, the average experience a bit smoother. It won't fix every site - no amount of code can solve for bad UX design. But it would lay a common foundation, so every site starts out a little bit better, and every dev has a little more time to focus on the other things.
+You can even call _other_ inherited methods using this, which is why you must specify it in the first place:
+
+```js
+class Car extends Vehicle {
+  start() {
+    super.ignition(...arguments);
+
+    this.currentGear = 'drive';
+  }
+}
+```
+
+This design choice for `super` was really about embracing the nature of Javascript's prototypical inheritance, instead of choosing to mimic other languages like Java that have different inheritance patterns.
+
+Finally, as with classic classes, you should generally pass all arguments through to the super calls for existing lifecycle hooks:
+
+```js
+class MultiSelectComponent extends Component {
+  didInsertElement() {
+    super.didInsertElement(...arguments);
+
+    // setup component element
+  }
+}
+```
+
+## When It's Ok to Use `extend()`
+
+One major part of the original classes RFC was ensuring that native classes that extend from `EmberObject` would be able to interoperate with classic class syntax, meaning that you would be able to continue using `.extend()` with them, without having to worry if a particular class was defined using native syntax or not. This was also the answer to how mixins would interoperate with native classes, since they don't have a native equivalent yet.
+
+However, it is also possible to use this feature in other ways, some of which have become antipatterns over time. For instance, `ember-cli-typescript` has recommended that users define their classes like so:
+
+```ts
+// do not copy this. This is an antipattern!
+export default class PersonComponent extends Component.extend({
+  fullName: computed('firstName', 'lastName', {
+    get() {
+      return `${this.firstName} ${this.lastName}`;
+    },
+  }),
+}) {
+  firstName = 'Diana';
+  lastName = 'Prince';
+}
+```
+
+This recommendation was made because the future of decorators in Ember was unclear at the time, and the Ember Typescript team wanted to ensure that users could write _safe_ code that wouldn't break at some point in the future. This was entirely reasonable, and really the best decision they could make at the time - this code is rock solid and _will not break_ or need to be updated until Ember v4 at the earliest (yay stability)!
+
+However, now that the Decorators RFC has been accepted, and `ember-decorators` has converted to matching the behavior of the RFC, this pattern is no longer ideal. In fact, it will be harder to convert going forward, since the [native class codemod](https://github.com/scalvert/ember-es6-class-codemod) currently does not support this style of syntax - though it would definitely be possible to add, and we would love contributions!
+
+So coming back to the original question - when should you use `.extend()`? There are only two cases where you should:
+
+1. When you are passing mixins to a class defined with native class syntax:
+
+   ```js
+   export default class PersonComponent extends Component.extend(
+     FullNameMixin,
+     OtherMixin
+   ) {
+     firstName = 'Diana';
+     lastName = 'Prince';
+   }
+   ```
+
+2. When you are using classic class syntax to define a class:
+
+   ```js
+   export default Component.extend({
+     fullName: computed({
+       get() {
+         return `${this.firstName} ${this.lastName}`;
+       }
+     }),
+
+     firstName: 'Diana',
+     lastName: 'Prince',
+   });
+   ```
+
+We're working on [a linting rule](https://github.com/scalvert/eslint-plugin-ember-es6-class/issues/4) that will prevent this as well, but unfortunately this is not something we can assert against in Ember itself. In any case, you should definitely avoid mixing the two styles in all circumstances.
+
+## Avoiding `.reopen()` and `.reopenClass()`
+
+Native classes don't _really_ have equivalents to `EmberObject`s ability to reopen class definitions willy-nilly and mess around with internals. You can patch class prototypes _directly_, but that's a much messier process in general, and that's a _good_ thing - it turns out being able to completely redefine classes arbitrarily is not a great idea 🙃
+
+However, there are legitimate use cases. In general, if you are relying on this behavior, you should _first_ try to find a way to refactor off of it without touching prototypes, constructors, etc. In the case of `.reopenClass()`, this will often times be as simple as adding `static` class fields and methods to the class definition, since that's almost always what the method is used for:
+
+```js
+// before
+export default Component.extend({}).reopenClass({
+  positionalParams: ['title', 'body']
+});
+
+// after
+export default class BlogPostComponent extends Component {
+  static positionalParams = ['title', 'body'];
+}
+```
+
+In the cases where you _can't_ easily refactor away from `.reopen()` or `.reopenClass()`, it's generally recommended that you _do_ keep using them. Prototypes are _hard_ (as I've personally learned _many_ times throughout this process), and `EmberObject` and its methods are not deprecated, so they'll continue working for some time to come. You can take your time to think of better ways to refactor away from them, there's no rush!
+
+## Avoiding `EmberObject`
+
+Alright, so after reading through all of that you may be thinking "that is a _lot_ to remember", and you would be right. `EmberObject` works well with native classes, but there definitely are some oddities such as having to use `init` instead of `constructor`, `create` instead of `new`, etc. that may be hard to keep track of. If you'd prefer to _not_ have to deal with these things, you actually can _opt-out_ today!
+
+All of Ember's decorators are completely compatible with _plain_ native classes. There is absolutely no need to extend `EmberObject`, and in fact it should be considered best practice to _avoid_ `EmberObject` whenever possible:
+
+```js
+// before
+class Person extends EmberObject {
+  firstName = null;
+  lastName = null;
+
+  @computed('firstName', 'lastName')
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+}
+
+let person = Person.create({
+  firstName: 'Carol',
+  lastName: 'Danvers'
+});
+
+// after
+class Person {
+  constructor(firstName, lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+
+  @computed('firstName', 'lastName')
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+}
+
+let person = new Person('Carol', 'Danvers');
+```
+
+This means that any utility classes written using `EmberObject` can be rewritten and converted away from it. In fact, you should only need to remember the rules in this post for _framework primitives_, such as:
+
+* Ember
+  * `@ember/component`
+  * `@ember/controller`
+  * `@ember/helper`
+  * `@ember/route`
+  * `@ember/service`
+* Ember Data
+  * `@ember-data/adapter`
+  * `@ember-data/model`
+  * `@ember-data/serializer`
+
+`@glimmer/component`, which was just accepted via RFC, will be implemented _without_ extending `EmberObject` which means you will not need to remember the rules and exceptions for newer components either. In general, when in doubt, use native classes!
+
+## Misc. Class Tips
+
+This section is for a few remaining tips/best practices that I have developed myself in using native classes. These recommendations are from my own personal experience, so take what you will from them.
+
+### Always give you class a name!
+
+Anonymous classes are a thing in JS:
+
+```js
+export default class {
+
+}
+```
+
+While this may seem nice, if you do this everywhere it means that you're going to have hundreds of the same indistinguishable classes when you're trying to debug, especially in the memory debugger 😱 It also makes your codebase much less searchable. Always add a name, even if it seems redundant!
+
+### Type your (framework) class names
+
+In my experience, it generally makes sense to add the _framework_ type of a class to its name as well. That is, if it is a _Route_, _Controller_, _Component_, or _Service_, you would want to name it `UserRoute`, `UserController`, `UserComponent`, or `UserService` respectively so you don't have 4 different classes named `User`!
+
+This is less of a hard and fast rule though. It generally doesn't make sense for Models for instance (`UserModel` sounds meh) or various utility classes. And if you prefer being able to omit `Component` from the name of every single component, maybe they're generally clear enough without it! Still, the fact that Routes and Controllers have so much overlap suggests you'll probably want to distinguish them, and for some reason I just feel the urge to add `Service` to the end of all my services.
+
+Note that this only applies to _class names_, appending the type to the end of file names is definitely not a good idea.
+
+### Don't rely on class field assignment order
+
+Class fields get assigned in order, from top to bottom. This means that it's entirely possible for a class field to rely on the values of _other_ class fields:
+
+```js
+class Person {
+  firstName = 'Tony';
+  lastName = 'Stark';
+
+  fullName = `${this.firstName} ${this.lastName}`;
+}
+```
+
+This is a bad idea because it makes your class harder to refactor. Moving a field around can break your class in unexpected ways, and it might take minute to figure out what's going on. Class fields definitely _read_ declaratively, and the fact that they _do_ have an assignment order is actually rather odd in that sense - intuitively, you might expect them to all exist at once, like assigments on an object literal.
+
+Note that this really only applies to class fields - once you're in a "hook" of some kind, like the `constructor` or `init`, it's safe to start using values. This is because moving the constructor around is safe, and functions are pretty easy to reason about locally (usually 😬):
+
+```js
+// EmberObject based class
+import Component from '@ember/component';
+
+class Person extends Component {
+  init() {
+    super.init(...arguments);
+    this.fullName = `${this.firstName} ${this.lastName}`;
+  }
+
+  firstName = 'Tony';
+  lastName = 'Stark';
+}
+
+// standard native classes
+class Person {
+  constructor() {
+    this.fullName = `${this.firstName} ${this.lastName}`;
+  }
+
+  firstName = 'Tony';
+  lastName = 'Stark';
+}
+```
+
+Generally, derived state like this is handled better by getters/setters, so this should be avoided if possible by using those.
+
+## Additional Resources
+
+* [Ember Decorators Guides](https://ember-decorators.github.io/ember-decorators/docs/native-class-basics)
+* [MDN Class Documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes)
+* [The Native Class Codemod (WIP)](https://github.com/scalvert/ember-es6-class-codemod)
+* [Ember Native Class ESLint Plugin](https://github.com/scalvert/eslint-plugin-ember-es6-class)
+
+And that's all folks! If you have more questions, join the [Ember Discord](https://www.emberjs.com/community/) and ask away, the `#e-decorators`, `#e-typescript`, `#st-native-classes`, and `#st-octane` channels are all great places to get some advice. Thanks for reading!

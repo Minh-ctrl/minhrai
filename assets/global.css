@@ -41,6 +41,13 @@ li {
     display: list-item;
     text-align: -webkit-match-parent;
 }
+ul li {
+    --tw-text-opacity: 1;
+    color: rgb(16 185 129 / var(--tw-text-opacity));  
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
+    text-underline-offset: 1px;
+}
 ol {
     margin-left: 2rem;
     margin-top: 1rem;
