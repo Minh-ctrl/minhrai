@@ -35,7 +35,7 @@ watchEffect(()=>{
                 <img :class="{icon_inverted: darkMode}" class="" src="/mokapot.gif"/>
 
                 <div :class="{darkMode: darkMode}" class="title PressStart2P text-xl text-slate-200">THE_MOKA_POT</div>
-                <div :class="{darkMode: darkMode}"  class="text-xs text-slate-200 PressStart2P">version 1.0</div>
+                <div :class="{darkMode: darkMode}"  class="text-xs text-slate-200 PressStart2P">version 0.9 beta</div>
 
                 <Nav :darkMode="darkMode"/>
             </div>

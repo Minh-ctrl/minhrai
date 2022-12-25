@@ -2,7 +2,7 @@
 title: 'Four Eras of JavaScript Frameworks'
 tagline: ''
 ---
-
+# NOTE: this was written by [pzuraq](https://www.pzuraq.com )
 I started coding primarily in JavaScript back in 2012. I had built a PHP app for a local business from the ground up, a basic CMS and website, and they decided that they wanted to rewrite it and add a bunch of features. The manager of the project wanted me to use .NET, partially because it's what he knew, but also because he wanted it to feel like a native application - no page refreshes or long pauses between actions. After a bit of research and prototyping, I convinced him that we could do the same thing with the web, using one of the brand new JS frameworks that were just starting to come out.
 
 The first framework I chose was actually Angular 1. I built a decent chunk of the app, with a FuelPHP backend, before I ran into some issues with the community router - it would flicker whenever you rerendered subroutes/outlets, and really it just didn't feel like it had been designed with that use case in mind. Someone recommended Ruby on Rails + Ember to me, and after giving it a shot I decided it worked pretty well. I liked the philosophy of both frameworks, liked the communities, and overall it was very productive compared to the alternatives at the time.

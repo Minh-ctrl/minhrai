@@ -29,7 +29,7 @@ pre[class*=language-] {
 
 .hljs {
     /* margin: 1rem; */
-    border: white solid 1px;
+    border: black solid 1px;
     --tw-text-opacity: 1;
     background: rgb(26, 23, 23);
     --tw-text-opacity: 1;

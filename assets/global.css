@@ -28,6 +28,10 @@
     font-family: 'Nunito-regular';
 
 }
+em { 
+    --tw-text-opacity: 1;
+    color: rgb(16 185 129 / var(--tw-text-opacity));  
+}
 p {
     line-height: 2rem;
 }
@@ -42,11 +46,10 @@ li {
     text-align: -webkit-match-parent;
 }
 ul li {
-    --tw-text-opacity: 1;
-    color: rgb(16 185 129 / var(--tw-text-opacity));  
-    -webkit-text-decoration-line: underline;
-    text-decoration-line: underline;
-    text-underline-offset: 1px;
+    margin-left: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    counter-reset: item;
 }
 ol {
     margin-left: 2rem;
@@ -63,6 +66,16 @@ ol a {
 }
 
 ol li:before {
+    content: counter(item) ".";
+    --tw-text-opacity: 1;
+    color: rgb(16 185 129 / var(--tw-text-opacity));    
+    counter-increment: item;
+    position: absolute;
+    text-align: right;
+    transform: translate(-100%);
+    margin-left: -.4em;
+}
+ul li:before {
     content: counter(item) ".";
     --tw-text-opacity: 1;
     color: rgb(16 185 129 / var(--tw-text-opacity));    
