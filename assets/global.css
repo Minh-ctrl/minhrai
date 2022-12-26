@@ -84,14 +84,32 @@ ul li:before {
     text-align: right;
     transform: translate(-100%);
     margin-left: -.4em;
+} 
+
+a {
+    --tw-text-opacity: 1;
+    color: rgb(16 185 129 / var(--tw-text-opacity));    
+    text-decoration: underline;
 }
-h1, h2, h3, h4, h5, h6 {
-    text-align: center;
+h1, h2, h3, h4, h5, h6{
     font-family:'PressStart2P-Regular';
     --tw-text-opacity: 1;
     color: rgb(16 185 129 / var(--tw-text-opacity));    
+    margin-top: 10px;
+}
+h1 {
+    text-align: center;
+    margin-top: 20px;
     letter-spacing: .025rem;
-    font-size: 1.60rem;
+    font-size: 1.6rem;
+}
+h2 {
+    letter-spacing: .025rem;
+    font-size: 1.5rem;
+}
+h3 {
+    letter-spacing: .025rem;
+    font-size: 1.2rem;
 }
 .SourceCode{
     font-family: 'SourceCode';
@@ -111,10 +129,3 @@ h1, h2, h3, h4, h5, h6 {
 .linkedin{
     opacity: 90%;
 }
-/* li {
-    color: blue
-} */
-/* .coffeMug{
-    list-style-image: url(../public/coffeeCup.gif);
-} */
-/* .coffeMug-inverted() */

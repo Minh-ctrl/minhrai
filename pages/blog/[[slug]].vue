@@ -14,20 +14,15 @@
             content = contents[i].body;
         }
     }
-    onMounted(()=>{
-       setTimeout(()=>{
-        document.querySelectorAll('pre').forEach((block)=>{
-            hljs.highlightElement(block), 100
-        })
-       })
-    });
+    document.querySelectorAll('pre').forEach((block)=>{
+        hljs.highlightElement(block), 100
+    })
 </script>
 <template >
     <div class="sm:w-9/12 w-full">
-
         <div class="sm:m-0 mt-10">
             <div class="italic text-emerald-500 PressStart2P text-center text-3xl xs:mt-2 mt-6" >{{slug}}</div>
-            <div class="ml-10 text-lg text-slate-200 SourceCode mt-10" v-html="content"/> 
+            <div class="pl-3 text-lg text-slate-200 SourceCode mt-10" v-html="content"/> 
         </div>
     </div>
 </template>

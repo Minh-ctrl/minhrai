@@ -14,5 +14,10 @@ const exampleData= [{name: 'Blog', id:1, route:'/'},{name: 'Favs (TBA)', id:2, r
 </template>
 
 <style scoped>
-
+    a{
+        text-decoration: none;
+    }
+    li {
+        list-style: none;
+    }
 </style>

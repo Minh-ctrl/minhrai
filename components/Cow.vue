@@ -7,8 +7,8 @@ defineProps({
 });
 </script>
 <template>
-<div class="flex flex-col justify-center mt-2">
-   <pre language="js" class="w-96 self-center">
+<div class="flex flex-col justify-center mt-2 ">
+   <pre language="js" class="sm:hidden self-center pr-5">
     _____________________________
     const message_from_cow = 🍔 
     _____________________________
