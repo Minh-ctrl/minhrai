@@ -26,7 +26,7 @@
 </template>
 
 <style src="./../assets/styles/night-owl.css"></style>
-<style >
+<style scoped>
     pre{
         font-size: 0.5rem;
         line-height: 0.5rem;
