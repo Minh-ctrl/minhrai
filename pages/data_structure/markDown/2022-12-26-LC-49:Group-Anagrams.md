@@ -1,6 +1,6 @@
 ---
 title: 'Leet Code 49: Group Anagrams'
-tagline: 'String manipulation, HashMap'
+taglines: '[String manipulation, HashMap]'
 ---
 
 
@@ -31,6 +31,8 @@ So for example, we'd have *"ate" === "eat"* as an example of anagrams group. oth
 
 It's worth pointing out that they aren't necessarily *pairs*, 3 words or more anagram groups do exist out there such as:
 * *"ANEW"* === *"WANE"* === *"WEAN"*
+
+well, the "words" in these questions aren't words FYI.
 
 ___
 
