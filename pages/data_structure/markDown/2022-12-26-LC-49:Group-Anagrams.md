@@ -78,7 +78,7 @@ Doesn't sound like a bad idea right? let's see this "algorithm" in action below:
 
 In this **particular input**, the first loop will give us *```["eat", "tea", "ate"]```*, then the 2nd will give us *```["tan","nat"]```* then finally *```["bat"]```*
 
-so we'd ended up performing *3* loops just to achieve the ideal output. doesn't seem that bad right?
+so we'd ended up performing 2 or 3 operations per iteration. 
 
 *BUTTTTTT*, to quote [CGP Grey](https://youtu.be/oAHbLRjF0vo):
 ```
@@ -95,10 +95,9 @@ so we'd ended up performing *3* loops just to achieve the ideal output. doesn't 
 ```
 ### So why is this solution bad? 
 
+**Answer: most sorting algorithm takes *O(nlogn)* in time complexity.** 
 
-**Answer: most sorting algorithm takes *O(nlogn)* in time complexity.**
-
-Complexity analysis of this solution: 
+Therefore, we can deduce the complexity analysis of this solution: 
 
 **The above approach yields us *O(m * nlog(n))* in time but *O(n)* in space complexity**
 
