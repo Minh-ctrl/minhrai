@@ -145,10 +145,10 @@ img {
     h3 {
         font-size: 0.8rem;
     }
-    /* pre{
+    pre{
         font-size: 0.6rem !important;
-        line-height: 0.5rem !important;
-    } */
+        line-height: 1rem !important;
+    }
  }
  .tag {
     font-size: 0.9rem;
