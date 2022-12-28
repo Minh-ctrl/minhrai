@@ -22,16 +22,16 @@ SOFTWARE.
 pre[class*=language-] {
   /* border: solid 1px var(--code-border); */
   padding: 1em;
-  margin: .5em 0 1.5em;
+  margin: .5em 0.5em 1.5em;
   overflow: auto;
-  border-radius: .99em;
+  /* border-radius: .99em; */
 }
 
 .hljs {
     /* margin: 1rem; */
     border: white solid 1px;
     --tw-text-opacity: 1;
-    background: rgb(15 23 42 / var(--tw-text-opacity));
+    background: black;
     --tw-text-opacity: 1;
     color: rgb(16 185 129 / var(--tw-text-opacity));  
   }

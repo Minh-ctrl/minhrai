@@ -23,7 +23,7 @@ In the future I'd like to dabble further into 3d technologies as well as honing 
 
 # *Sharing*
 ___
-An important skill that is especially important in software development is the ability to *learn*. Often, for the sake of development, you are asked to utilize a skill/technology/framework/[insert buzz word here] that you've never used in your life before. As such, getting comfortable with doing something new everytime is something that most developer have to be ok with in order to improve themselves. In that spirit, I'd like to share what I've learned making this project!
+An important skill that is especially important in software development is the ability to *learn*. Often, for the sake of development, you are asked to utilize a skill/technology/framework/ [insert buzz word here] that you've never used in your life before. As such, getting comfortable with doing something new everytime is something that most developer have to be ok with in order to improve themselves. In that spirit, I'd like to share what I've learned making this project!
 ___
 1.  New features Nuxt 3 has to offer (auto-imports is amazing...). 
 2.  SPA deployment.
