@@ -25,4 +25,6 @@
         </div>
 </template>
 
-<style src="./../assets/styles/night-owl.css"></style>
+// <style src="./../assets/styles/night-owl.css"></style>
+<style src="./../assets/styles/atelier-cave.css"></style>
+
