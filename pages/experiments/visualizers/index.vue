@@ -1,15 +1,13 @@
 <script setup>
     import * as THREE from 'three';
     import TPA from './TPA.mp3'
-    // import {OrbitControls} from "./../../../node_modules/three/examples/jsm/controls/OrbitControls.js"
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = window.innerWidth *0.75;
+    const height = window.innerHeight * 0.75;
     const camera = new THREE.OrthographicCamera(-550, -250, 1200, -200, 200, 5000)
 
     let listener = new THREE.AudioListener();
     const sound = new THREE.Audio(listener);
     const loader = new THREE.AudioLoader();
-    console.log(width, height, 'check here')
     async function clickMe() {
         if (sound && sound.isPlaying){
             sound.stop();
@@ -20,11 +18,10 @@
                 sound.setVolume(1);
                 sound.play();})
         }
-        camera.position.set(400,1000,300)
-        camera.lookAt(400,0,0)
+        camera.position.set(500,200,800)
+        camera.lookAt(400,50,0)
     let analyzer = new THREE.AudioAnalyser(sound, 128);
 
-    // const controls = new OrbitControls(camera, document.getElementById("visualizer"));
     // renderer
     const dimension =  Math.min(window.innerHeight / 1.5, window.innerWidth / 1.5)
     const renderer = new THREE.WebGLRenderer({
@@ -117,6 +114,6 @@
 
 
 <template>
-
+    <div class="sm:w-9/12 w-full SourceCode text-slate-200 text-center mt-5 ">3d testing, click on the black screen to start </div>
     <canvas @click="clickMe()"  class="sm:w-9/12 w-full h-1/2" id="visualizer"></canvas>
 </template>
