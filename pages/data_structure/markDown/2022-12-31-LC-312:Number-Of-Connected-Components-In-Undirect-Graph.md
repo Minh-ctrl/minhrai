@@ -18,7 +18,7 @@ Hoo boi, this one shows up at a technical interview i had not too long ago, I ha
 
 ### The code:
 
-```py
+<pre class="hljs language-python">
 def countComponents(self, n: int, edges):
     par = [i for i in range(n)]
     rank = [1] * n
@@ -45,31 +45,4 @@ def countComponents(self, n: int, edges):
     for n1, n2 in edges:
         res -= union(n1, n2)
     return res
-```
-
-```py
-def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
-    res = defaultdict(list); #ignore the python jibber jabber, here we're just initializing the Hmap
-    for s in strs:
-        count = [0] * 26 
-        for c in s:
-            count[ord(c)- ord('a')] +=1 #ord built-in function calculates the unicode value of the character 
-                                        # so --> unicode val of character - unicode of a gives the alphabetical order
-        res[tuple(count)].append(s) #tuple is sub-array, again python syntax
-    return res.values()
-```
-
-```
-@requires_authorization(roles=["ADMIN"])
-def somefunc(param1='', param2=0):
-    r'''A docstring'''
-    if param1 > param2: # interesting
-        print 'Gre\'ater'
-    return (param2 - param1 + 1 + 0b10l) or None
-
-class SomeClass:
-    pass
-
->>> message = '''interpreter
-... prompt'''
-```
+</pre>

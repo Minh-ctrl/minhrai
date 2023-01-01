@@ -160,7 +160,7 @@ After inputting into *Hashmap*, we simply only have to return all the *values* t
 
 ### The code:
 
-```py
+<pre class="hljs language-python">
 def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
     res = defaultdict(list); #ignore the python jibber jabber, here we're just initializing the Hmap
     for s in strs:
@@ -170,8 +170,7 @@ def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
                                         # so --> unicode val of character - unicode of a gives the alphabetical order
         res[tuple(count)].append(s) #tuple is sub-array, again python syntax
     return res.values()
-```
-
+</pre>
 This solution gives us **O(n * m * 26 )** which is essentially **O(n * m)** both space and time complexity
 
 Much faster than the "simple" method.

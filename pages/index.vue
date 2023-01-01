@@ -14,8 +14,6 @@
 
 <template>
         <div class="sm:w-9/12 w-full">
-
-
             <div class="text-xl text-emerald-600 mt-5 flex flex-col" v-for="content in contents" :key="content.slug">
                 <NuxtLink class="PressStart2P text-emerald-500 hover:text-emerald-600 underline-offset-2 underline text-center" :to="`/blog/${content.slug}`">{{ content.title }}</NuxtLink>
                 <div class="md:w-1/2 align-middle self-center">
@@ -25,6 +23,5 @@
         </div>
 </template>
 
-// <style src="./../assets/styles/night-owl.css"></style>
-<style src="./../assets/styles/atelier-cave.css"></style>
+<style src="./../assets/styles/night-owl.css"></style>
 

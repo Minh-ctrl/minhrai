@@ -12,11 +12,13 @@
     "nuxt": "^3.0.0"
   },
   "dependencies": {
+    "@types/three": "^0.147.1",
     "highlight.js": "^11.7.0",
     "marked": "^4.2.5",
     "parse-md": "^3.0.3",
     "path-browserify": "^1.0.1",
     "simple-syntax-highlighter": "^2.2.3",
+    "three": "^0.148.0",
     "vue3-marquee": "^3.0.7"
   }
 }
