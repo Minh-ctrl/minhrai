@@ -11,7 +11,7 @@ const darkMode = inject('darkMode');
                     Hey there! My name is Minh.
                 </div>
                 <div class="SourceCode text-slate-200 ml-5 mt-5 mr-5 xs:text-center "> 
-                    I'm a Full-Stack Engineer in Japan with 1 year of cummulative professional experience in <p class="text-emerald-500 inline">Web Development</p>.
+                    I'm a Full-Stack Engineer in Japan within <p class="text-emerald-500 inline">Web Development</p>.
                     Personally, I believe in the <p class="text-emerald-500 inline"> Learn &lt;==> Practice</p> loop.
                     This website here serves as a journal for me to codify the knowledge I've accumulated from work/study/life. 
                     Expect to see blog posts relating to  <p class="text-emerald-500 inline"> Technologies (most likely web)</p>  I've been studying as well as <p class="inline text-emerald-500">Data structure and algorithms Studies</p>.
